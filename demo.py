@@ -2,6 +2,8 @@ import numpy as np
 import cv2 as cv
 
 # Instalar a biblioteca cv2 pode ser um pouco demorado. Não deixe para ultima hora!
+# Para instalar, rode o comando abaixo no terminal:
+# pip install opencv-python
 
 #função importada do notebook da aula da matéria que cria os índices para a matriz do frame da imagem
 def criar_indices(min_i, max_i, min_j, max_j):
@@ -59,8 +61,6 @@ def run():
         # Atribuir os valores da imagem original para a imagem transformada
         image_[Xd[0,:], Xd[1,:], :] = image[X[0,:], X[1,:], :]
         
-
-
         # Se aperto 'q', encerro o loop
         if cv.waitKey(1) == ord('q'):
             break
@@ -71,8 +71,6 @@ def run():
         # Agora, mostrar a imagem na tela!
         cv.imshow('Minha Imagem!', image_)
         
-        
-
     # Ao sair do loop, vamos devolver cuidadosamente os recursos ao sistema!
     cap.release()
     cv.destroyAllWindows()
