@@ -60,7 +60,7 @@ def run():
         X = X[:,filtro]
         # Atribuir os valores da imagem original para a imagem transformada
         image_[Xd[0,:], Xd[1,:], :] = image[X[0,:], X[1,:], :]
-        
+        ""
         # Se aperto 'q', encerro o loop
         if cv.waitKey(1) == ord('q'):
             break
