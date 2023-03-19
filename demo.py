@@ -19,6 +19,7 @@ def run():
     # Essa função abre a câmera. Depois desta linha, a luz de câmera (se seu computador tiver) deve ligar.
     cap = cv.VideoCapture(0)
 
+
     # Aqui, defino a largura e a altura da imagem com a qual quero trabalhar.
     # Dica: imagens menores precisam de menos processamento!!!
     width = 320
@@ -28,6 +29,11 @@ def run():
     if not cap.isOpened():
         print("Não consegui abrir a câmera!")
         exit()
+
+    # Definir o codec de vídeo
+    fourcc = cv.VideoWriter_fourcc(*'mp4v') # codec de vídeo
+    # Definir o arquivo de saída
+    out = cv.VideoWriter('output.mp4', fourcc, 20, (320, 240)) # nome do arquivo, codec, taxa de frames, tamanho do quadro
 
     # definir uma matriz de rotação identidade para ser incrementada
     matriz_rotação_incrementa = np.eye(3)
@@ -48,13 +54,15 @@ def run():
         # Mudo o tamanho do meu frame para reduzir o processamento necessário
         # nas próximas etapas
         frame = cv.resize(frame, (width,height), interpolation =cv.INTER_AREA)
+        
+        out.write(frame)
 
         # A variável image é um np.array com shape=(width, height, colors)
         image = np.array(frame).astype(float)/255
 
 
         #condição para girar a imagem
-        if gira == True:
+        if gira == True and contrai == False:
             # Crie uma imagem preta com o mesmo tamanho da imagem original
             image_ = np.zeros_like(image)
 
@@ -92,7 +100,7 @@ def run():
 
         
         #Condição para realizar uma contração na imagem   
-        elif contrai == True:
+        elif gira== False and contrai == True:
              # Crie uma imagem preta com o mesmo tamanho da imagem original
             image_ = np.zeros_like(image)
         
@@ -102,9 +110,12 @@ def run():
             # Adicione uma linha de 1s para facilitar a multiplicação
             Xd = np.vstack((Xd,np.ones((1,Xd.shape[1]))))
 
+
+            matriz_translação = np.array([[1, 0, -(image.shape[0]/2)], [0, 1, -(image.shape[1]/2)], [0, 0,1]])                    
+            
             matriz_contracao = np.array([[0.5, 0, 0], [0, 1, 0], [0, 0,1]])
-            matriz_translacao = np.array([[1, 0, 50], [0, 1, 0], [0, 0,1]]) 
-            matriz_transformação = matriz_translacao @ matriz_contracao
+            
+            matriz_transformação = np.linalg.inv(matriz_translação) @ matriz_rotação_incrementa @ matriz_translação @ matriz_contracao
             X = np.linalg.inv(matriz_transformação) @ Xd
 
             # Converter os valores para inteiros
@@ -122,6 +133,8 @@ def run():
             
             # Atribuir os valores da imagem original para a imagem transformada
             image_[Xd[0,:], Xd[1,:], :] = image[X[0,:], X[1,:], :]
+
+       
         else:
             image_ = image
 
@@ -139,20 +152,27 @@ def run():
         # Se aperto 'a', a imagem começa a girar para direita
         elif q == ord('a'):
             gira = True
+            contrai = False
             # Incrementar a matriz de rotação
             matriz_rotação_incrementa = matriz_rotação @ matriz_rotação_incrementa  
         # Se aperto 'd', a imagem começa a girar para esquerda
         elif q == ord('d'):
             gira = True
+            contrai = False
             # Incrementar a matriz de rotação
             matriz_rotação_incrementa = np.linalg.inv(matriz_rotação) @ matriz_rotação_incrementa
         # Se aperto 's', a imagem começa realiza uma contração
         elif q == ord('s'):
             contrai = True
+            gira = False
+        
+        
+        
 
     
     # Ao sair do loop, vamos devolver cuidadosamente os recursos ao sistema!
     cap.release()
+    out.release() 
     cv.destroyAllWindows()
 
 if __name__ == "__main__":
