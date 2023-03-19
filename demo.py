@@ -141,9 +141,13 @@ def run():
             gira = True
             # Incrementar a matriz de rotação
             matriz_rotação_incrementa = matriz_rotação @ matriz_rotação_incrementa  
-
-        # Se aperto 'd', a imagem começa realiza uma expansão
+        # Se aperto 'd', a imagem começa a girar para esquerda
         elif q == ord('d'):
+            gira = True
+            # Incrementar a matriz de rotação
+            matriz_rotação_incrementa = np.linalg.inv(matriz_rotação) @ matriz_rotação_incrementa
+        # Se aperto 's', a imagem começa realiza uma contração
+        elif q == ord('s'):
             contrai = True
 
     
