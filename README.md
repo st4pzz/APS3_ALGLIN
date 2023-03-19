@@ -15,6 +15,10 @@ A função *run* é responsável por abrir a câmera do computador e mostrar a i
 ## Como rodar o projeto
 Para rodar o projeto e testar o projeto, basta acessar e rodar o arquivo demo.py, nesse arquivo você pode visualizar a sua camera e com as teclas "A" ou D", fazer sua camera rodar, e a tecla "Q"para fechar a janela da imagem exibida.
     
+## Prévia
+
+![Screen Recording 2023-03-19 at 7 45 08 PM](https://user-images.githubusercontent.com/89090868/226214924-62cc0bf2-242b-47e8-a680-fd2f1accbbc3.gif)
+
 ## Autores
 
 - [@st4pzz](https://github.com/st4pzz)
