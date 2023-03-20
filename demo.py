@@ -205,11 +205,14 @@ def run():
             contrai = True
             gira_direita = False
             gira_esquerda = False
-        
-        
-        
 
-    
+        #Se aperto 'w', a imagem volta ao estado original
+        elif q == ord('w'):
+            contrai = True
+            gira_direita = True
+            gira_esquerda = True
+
+        
     # Ao sair do loop, vamos devolver cuidadosamente os recursos ao sistema!
     cap.release()
     out.release() 
