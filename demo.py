@@ -41,7 +41,7 @@ def run():
     matriz_rotação = np.array([[0.98480774002, -0.17364825133, 0], [0.17364825133, 0.98480774002, 0],  [0, 0,1]])
     # Esse loop é igual a um loop de jogo: ele encerra quando apertamos 'q' no teclado.
 
-    gira,contrai = False,False
+    gira_direita,gira_esquerda,contrai = False,False,False
     while True:
         # Captura um frame da câmera
         ret, frame = cap.read()
@@ -61,8 +61,8 @@ def run():
         image = np.array(frame).astype(float)/255
 
 
-        #condição para girar a imagem
-        if gira == True and contrai == False:
+        #condição para girar a imagem para a direita
+        if gira_direita == True and contrai == False and gira_esquerda == False:
             # Crie uma imagem preta com o mesmo tamanho da imagem original
             image_ = np.zeros_like(image)
 
@@ -93,14 +93,54 @@ def run():
             Xd = Xd[:,filtro]
             # Aplicar o filtro
             X = X[:,filtro]
-           
+            # Incrementar a matriz de rotação
+            matriz_rotação_incrementa = matriz_rotação @ matriz_rotação_incrementa  
+
+            # Atribuir os valores da imagem original para a imagem transformada
+            image_[Xd[0,:], Xd[1,:], :] = image[X[0,:], X[1,:], :]
+
+        #condição para girar a imagem para a esquerda
+        elif gira_direita == False and contrai == False and gira_esquerda == True:
+            # Crie uma imagem preta com o mesmo tamanho da imagem original
+            image_ = np.zeros_like(image)
+
+            # Crie os índices para a matriz do frame da imagem
+            Xd= criar_indices(0, image.shape[0], 0, image.shape[1])
+            
+            # Adicione uma linha de 1s para facilitar a multiplicação
+            Xd = np.vstack((Xd,np.ones((1,Xd.shape[1]))))
+
+            # Crie uma matriz de translação para o centro da imagem
+            matriz_translação = np.array([[1, 0, -(image.shape[0]/2)], [0, 1, -(image.shape[1]/2)], [0, 0,1]])        
+            # Crie uma matriz única de transformação 
+            matriz_transformação = np.linalg.inv(matriz_translação) @ matriz_rotação_incrementa @ matriz_translação
+
+            # Cria uma nova matriz que é o resultado da multiplicação entre o inverso da matriz de transformação, para que todos os pixels da imagem original sejam transformados para a imagem transformada, e a matriz dos índices da imagem original.
+            X = np.linalg.inv(matriz_transformação) @ Xd
+
+            # Converter os valores para inteiros
+            X = X.astype(int)
+            # Converter os valores para inteiros
+            Xd = Xd.astype(int)
+            
+
+            # Criar um filtro para remover os pontos que não estão na imagem
+            filtro = (X[0,:]>=0)&(X[0,:]<image_.shape[0])&(X[1,:]>=0)&(X[1,:]<image_.shape[1])
+
+            # Aplicar o filtro
+            Xd = Xd[:,filtro]
+            # Aplicar o filtro
+            X = X[:,filtro]
+            
+            # Incrementar a matriz de rotação
+            matriz_rotação_incrementa = np.linalg.inv(matriz_rotação) @ matriz_rotação_incrementa
 
             # Atribuir os valores da imagem original para a imagem transformada
             image_[Xd[0,:], Xd[1,:], :] = image[X[0,:], X[1,:], :]
 
         
         #Condição para realizar uma contração na imagem   
-        elif gira== False and contrai == True:
+        elif gira_direita== False and gira_esquerda==False  and contrai == True:
              # Crie uma imagem preta com o mesmo tamanho da imagem original
             image_ = np.zeros_like(image)
         
@@ -151,20 +191,20 @@ def run():
             break
         # Se aperto 'a', a imagem começa a girar para direita
         elif q == ord('a'):
-            gira = True
+            gira_direita = True
             contrai = False
-            # Incrementar a matriz de rotação
-            matriz_rotação_incrementa = matriz_rotação @ matriz_rotação_incrementa  
+            gira_esquerda = False
+            
         # Se aperto 'd', a imagem começa a girar para esquerda
         elif q == ord('d'):
-            gira = True
+            gira_direita =False
             contrai = False
-            # Incrementar a matriz de rotação
-            matriz_rotação_incrementa = np.linalg.inv(matriz_rotação) @ matriz_rotação_incrementa
+            gira_esquerda = True
         # Se aperto 's', a imagem começa realiza uma contração
         elif q == ord('s'):
             contrai = True
-            gira = False
+            gira_direita = False
+            gira_esquerda = False
         
         
         
